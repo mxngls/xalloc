@@ -1,0 +1,15 @@
+CompileFlags:
+  Add: [
+    -xc,
+    -std=c99, 
+    -fsanitize=undefined, 
+    -Wall, 
+    -Wextra, 
+    -Wconversion, 
+    -W-sign-conversion, 
+    -Wdouble-promotion
+    -Werror,
+    -Wpedantic,
+    -Wpointer-arith,
+    -Wno-deprecated-declarations, # "sbrk" and "brk"
+  ]
