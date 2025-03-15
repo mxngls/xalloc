@@ -16,7 +16,7 @@ typedef union _block {
 } block;
 
 static block  head;
-static block *headp = &head;
+static block *headp = &head; // point to start of linked list;
 
 void *xalloc(size_t size) {
         block *p;
@@ -75,7 +75,29 @@ void *xalloc(size_t size) {
         return (void *)(newp + 1);
 }
 
-// void xfree(block_ptr block) { return; }
+int xfree(void *p) {
+        if (p == NULL)
+                return -1;
+
+        block *b = (block *)p - 1;
+
+        bool   found = false;
+        block *cp    = headp;
+        while (cp != NULL) {
+                if (cp == b) {
+                        found = true;
+                        break;
+                }
+                cp = cp->data.next;
+        }
+
+        if (!found)
+                return -1;
+
+        b->data.free = true;
+
+        return 0;
+}
 
 int main(void) {
         char *src = "Hello, World!";
