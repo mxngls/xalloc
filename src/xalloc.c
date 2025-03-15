@@ -30,7 +30,7 @@ void *xalloc(size_t size) {
 
         // look for free memory in already allocated blocks
         p = headp;
-        while (p->data.next != NULL) {
+        while (p != NULL) {
                 if (p->data.size >= aligned_size && p->data.free == true) {
                         // split if found block is significantly larger
                         // then the requested size
