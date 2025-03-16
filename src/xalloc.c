@@ -19,7 +19,7 @@ static block  head;
 static block *headp = &head; // point to start of linked list;
 
 void *xalloc(size_t size) {
-        block *p;
+        block *curr_p;
         block *newp;
         block *prevp = NULL;
         size_t aligned_size;
@@ -29,31 +29,33 @@ void *xalloc(size_t size) {
         aligned_size = (size + sizeof(void *) - 1) & ~(sizeof(void *) - 1);
 
         // look for free memory in already allocated blocks
-        p = headp;
-        while (p != NULL) {
-                if (p->data.size >= aligned_size && p->data.free == true) {
+        curr_p = headp;
+        while (curr_p) {
+                if (curr_p->data.size >= aligned_size && curr_p->data.free) {
                         // split if found block is significantly larger
                         // then the requested size
-                        if (p->data.size >= aligned_size + sizeof(block) + sizeof(void *)) {
+                        printf("curr_p | size: %zu | address: %p\n", curr_p->data.size,
+                               (void *)curr_p);
+                        if (curr_p->data.size >= aligned_size + sizeof(block) + sizeof(void *)) {
                                 // define a new block exactly `aligned_size` single bytes from the
                                 // start of the current block
-                                block *split = (block *)((char *)(p + 1) + aligned_size);
+                                block *split = (block *)((char *)(curr_p + 1) + aligned_size);
 
-                                split->data.size = p->data.size - aligned_size - sizeof(block);
-                                split->data.next = p->data.next;
+                                split->data.size = curr_p->data.size - aligned_size - sizeof(block);
+                                split->data.next = curr_p->data.next;
                                 split->data.free = true;
 
                                 // update original block
-                                p->data.size = aligned_size;
-                                p->data.next = split;
+                                curr_p->data.size = aligned_size;
+                                curr_p->data.next = split;
                         }
 
                         // mark original block as used and return it
-                        p->data.free = false;
-                        return (void *)(p + 1);
+                        curr_p->data.free = false;
+                        return (void *)(curr_p + 1);
                 }
-                prevp = p;
-                p     = p->data.next;
+                prevp  = curr_p;
+                curr_p = curr_p->data.next;
         }
 
         // request more memory
@@ -67,7 +69,7 @@ void *xalloc(size_t size) {
         newp->data.free = false;
         newp->data.next = NULL;
 
-        if (headp == NULL)
+        if (!headp)
                 headp = newp;
         else
                 prevp->data.next = newp;
@@ -76,15 +78,15 @@ void *xalloc(size_t size) {
 }
 
 int xfree(void *p) {
-        if (p == NULL)
+        if (!p)
                 return -1;
 
         block *b = (block *)p - 1;
 
         bool   found = false;
         block *cp    = headp;
-        while (cp != NULL) {
                 if (cp == b) {
+        while (curr_p) {
                         found = true;
                         break;
                 }

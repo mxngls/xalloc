@@ -7,7 +7,7 @@
 #define VARNAME(variable) (#variable)
 
 int main(void) {
-        // Keep track of all allocated (block) pointers;
+        // keep track of all allocated (block) pointers;
         void *p_arr[10] = {0};
         int   p_arr_idx = 0;
 
@@ -19,15 +19,13 @@ int main(void) {
         dst                = xalloc(strlen(src) + 1);
         p_arr[p_arr_idx++] = dst;
 
-        if (dst == NULL) {
+        if (!dst)
                 printf("Allocation failed\n");
-                return 1;
-        }
 
         strcpy(dst, src);
         printf("Allocation of \"%s\" at address: %p\n", dst, (void *)src);
-
-        printf("Free result: %s\n", xfree(dst) == 0 ? "Success" : "Failed");
+        printf("Freeing %s at address: %p%s successfull\n", VARNAME(dst), (void *)dst,
+               xfree(dst) == 0 ? "" : " NOT");
         // -----------------------------------------------------------------------------------------
 
         // Test 2: Multiple allocations and frees
@@ -40,16 +38,13 @@ int main(void) {
         nums_second = xalloc(10 * sizeof(int));
         nums_third  = xalloc(15 * sizeof(int));
 
-        p_arr[p_arr_idx++] = nums_first;
-        p_arr[p_arr_idx++] = nums_second;
-        p_arr[p_arr_idx++] = nums_third;
-
         printf("Allocation of integer array (%s) at address %p\n", VARNAME(nums_first),
                (void *)nums_first);
         printf("Allocation of integer array (%s) at address %p\n", VARNAME(nums_second),
                (void *)nums_second);
         printf("Allocation of integer array (%s) at address %p\n", VARNAME(nums_third),
                (void *)nums_third);
+        printf("\n");
 
         if (nums_first && nums_second && nums_third) {
                 for (int i = 0; i < 5; i++)
@@ -59,12 +54,12 @@ int main(void) {
                 for (int i = 0; i < 15; i++)
                         nums_third[i] = i * 100;
 
-                printf("Freeing %s at address %s: %p\n", VARNAME(nums_second),
-                       xfree(nums_second) == 0 ? "success" : "failed", (void *)nums_second);
-                printf("Freeing %s at address %s: %p\n", VARNAME(nums_first),
-                       xfree(nums_first) == 0 ? "success" : "failed", (void *)nums_first);
-                printf("Freeing %s at address %s: %p\n", VARNAME(nums_third),
-                       xfree(nums_third) == 0 ? "success" : "failed", (void *)nums_third);
+                printf("Freeing %s at address %p%s successfull\n", VARNAME(nums_second),
+                       (void *)nums_second, xfree(nums_second) == 0 ? "" : " NOT");
+                printf("Freeing %s at address %p%s successfull\n", VARNAME(nums_first),
+                       (void *)nums_first, xfree(nums_first) == 0 ? "" : " NOT");
+                printf("Freeing %s at address %p%s successfull\n", VARNAME(nums_third),
+                       (void *)nums_third, xfree(nums_third) == 0 ? "" : " NOT");
         } else {
                 printf("Some allocations failed\n");
         }
@@ -73,7 +68,7 @@ int main(void) {
         // Test 3: Reallocate after calling xfree
         printf("\nTest 3: Reallocation after free\n");
         char *buf;
-        if ((buf = xalloc(50 * sizeof(char))) == NULL) {
+        if (!(buf = xalloc(50 * sizeof(char)))) {
                 printf("Allocation failed\n");
         }
         p_arr[p_arr_idx++] = buf;
@@ -92,14 +87,15 @@ int main(void) {
         else
                 printf("Allocation of \"%s\" at address %p\n", buf, (void *)buf);
 
-        xfree(buf);
+        printf("Freeing %s at address %p%s successfull\n", VARNAME(buf), (void *)buf,
+               xfree(buf) == 0 ? "" : " NOT");
         // -----------------------------------------------------------------------------------------
 
-        // Test 4: Invalid free (attempt to free stack memory)
-        printf("\nTest 4: Invalid free\n");
+        // Test 4: Prevent invalid freeing (attempt to free stack memory)
+        printf("\nTest 4: Prevent invalid freeing\n");
         char local_buffer[20] = "Hello, World!";
         printf("Trying to free invalid pointer: %s\n",
                xfree(local_buffer) == -1 ? "correctly rejected" : "errounsly accepted");
+        // -----------------------------------------------------------------------------------------
 
-        return 0;
 }
