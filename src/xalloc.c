@@ -121,7 +121,7 @@ int main(void) {
         }
 
         strcpy(dst, src);
-        printf("Allocation of %s at address: %p\n", dst, (void *)src);
+        printf("Allocation of \"%s\" at address: %p\n", dst, (void *)src);
 
         printf("Free result: %s\n", xfree(dst) == 0 ? "Success" : "Failed");
         // -----------------------------------------------------------------------------------------
@@ -140,9 +140,12 @@ int main(void) {
         p_arr[p_arr_idx++] = nums_second;
         p_arr[p_arr_idx++] = nums_third;
 
-        printf("Allocation of integer array at address %p\n", (void *)nums_first);
-        printf("Allocation of integer array at address %p\n", (void *)nums_second);
-        printf("Allocation of integer array at address %p\n", (void *)nums_third);
+        printf("Allocation of integer array (%s) at address %p\n", VARNAME(nums_first),
+               (void *)nums_first);
+        printf("Allocation of integer array (%s) at address %p\n", VARNAME(nums_second),
+               (void *)nums_second);
+        printf("Allocation of integer array (%s) at address %p\n", VARNAME(nums_third),
+               (void *)nums_third);
 
         if (nums_first && nums_second && nums_third) {
                 for (int i = 0; i < 5; i++)
@@ -167,7 +170,7 @@ int main(void) {
         printf("\nTest 3: Reallocation after free\n");
         char *buf;
         if ((buf = xalloc(50 * sizeof(char))) == NULL) {
-                printf("Second allocation failed\n");
+                printf("Allocation failed\n");
         }
         p_arr[p_arr_idx++] = buf;
 
@@ -183,7 +186,7 @@ int main(void) {
         if (found == false)
                 printf("Reuse of previously freed buffer failed!\n");
         else
-                printf("Second allocation: \"%s\" at address %p\n", buf, (void *)buf);
+                printf("Allocation of \"%s\" at address %p\n", buf, (void *)buf);
 
         xfree(buf);
         // -----------------------------------------------------------------------------------------
