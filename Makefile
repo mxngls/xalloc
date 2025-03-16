@@ -35,7 +35,7 @@ build-test: build-dir
 
 # Run the test program
 test: build-test
-	./$(OUT_DIR)/test
+	@./$(OUT_DIR)/test
 
 # Clean build artifacts
 clean:
