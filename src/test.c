@@ -98,4 +98,35 @@ int main(void) {
                xfree(local_buffer) == -1 ? "correctly rejected" : "errounsly accepted");
         // -----------------------------------------------------------------------------------------
 
+        // Test 5: Block merging (defragmentation)
+        printf("\nTest 5: Block merging (defragmentation)\n");
+
+        // allocate three blocks in a row
+        int *first_buf  = xalloc(100 * sizeof(int));
+        int *second_buf = xalloc(100 * sizeof(int));
+        int *third_buf  = xalloc(100 * sizeof(int));
+
+        printf("Allocated %s at address: %p\n", VARNAME(first_buf), (void *)first_buf);
+        printf("Allocated %s at address: %p\n", VARNAME(second_buf), (void *)second_buf);
+        printf("Allocated %s at address: %p\n", VARNAME(third_buf), (void *)third_buf);
+        printf("\n");
+
+        // free blocks to create adjacent free blocks
+        printf("Freeing %s at address %p%s successfull\n", VARNAME(first_buf), (void *)first_buf,
+               xfree(first_buf) == 0 ? "" : " NOT");
+        printf("Freeing %s at address %p%s successfull\n", VARNAME(second_buf), (void *)second_buf,
+               xfree(second_buf) == 0 ? "" : " NOT");
+        printf("Freeing %s at address %p%s successfull\n", VARNAME(third_buf), (void *)third_buf,
+               xfree(third_buf) == 0 ? "" : " NOT");
+
+        int *new_buf = xalloc(180 * sizeof(int));
+
+        if (!(new_buf <= first_buf &&
+              ((char *)new_buf + 180 * sizeof(new_buf) > (char *)first_buf)))
+                printf("Merging of previously freed block failed.\n");
+
+        // free the remaining blocks
+        printf("Freeing %s at address %p%s successfull\n", VARNAME(new_buf), (void *)new_buf,
+               xfree(new_buf) == 0 ? "" : " NOT");
+        // -----------------------------------------------------------------------------------------
 }
